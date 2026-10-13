@@ -1,0 +1,40 @@
+Copyright (c) 2026 527665 (https://github.com/527665)
+
+All Rights Reserved.
+
+本仓库源代码公开可见，但未授予任何开源许可证。
+This source code is made publicly available for viewing, but is NOT open source.
+No license is granted to you under any open source license, including but not
+limited to MIT, Apache-2.0, BSD, or GPL.
+
+允许 / Permitted:
+
+- 阅读、克隆、在本地编译运行。
+  Read, clone, compile and run the code locally.
+- 改造后仅用于个人学习与研究，不得发布或分发改造版本。
+  Modify for personal study and research only; do not publish or distribute
+  the modified version.
+- 在技术文章、课程作业、面试演示中引用本项目思路，注明出处与仓库地址。
+  Reference the project's design in articles, coursework or interviews with
+  attribution and a link to this repository.
+- 提交 Issue 与 Pull Request。
+  File issues and submit pull requests.
+
+未经授权不得 / Not permitted without written permission from the author:
+
+- 将本仓库的代码、提示词或文档复制进任何其他项目，无论开源、闭源或盈利。
+  Copying this code, prompts or documentation into any other project, whether
+  open source, closed source, commercial or personal.
+- 去除署名后重新发布，或作为独立作品分发。
+  Republishing without attribution, or distributing as an original work.
+- 将本仓库内容作为模型训练语料再分发。
+  Redistributing this content as machine-learning training data.
+
+说明 / Note:
+
+本文件约束的是代码的使用与再分发权利，不改变 GitHub 服务条款对公开仓库的
+既有规定。需要商用或二次授权，请通过 GitHub Issue 或账号主页联系方式协商。
+
+This file governs the rights to use and redistribute the code. It does not
+alter GitHub's Terms of Service regarding public repositories. For commercial
+use or additional licensing, contact the author.

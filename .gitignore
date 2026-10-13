@@ -1,0 +1,95 @@
+# ============================================================
+# 知行旅行助手 .gitignore
+# 作用：告诉 Git 哪些文件永远不要提交到仓库（尤其 GitHub）
+# 原则：密钥、隐私、体积巨大或机器专属的东西，一律排除
+# ============================================================
+
+# ---------- 1. 环境变量与密钥（最高优先级，绝不能提交）----------
+# 真实密钥与数据库口令只保存在本地 .env
+.env
+.env.local
+.env.*.local
+# 例外：! 开头表示"不忽略"，放行给他人参考的模板文件（只有占位符，无真实值）
+!.env.example
+
+# 其他可能含密钥的文件类型，一并兜底
+*.key
+*.pem
+*.pfx
+auth.json
+secrets.json
+
+# ---------- 2. 本地 AI 协作配置（仅本地使用）----------
+AGENTS.md
+
+# ---------- 3. 浏览器用户数据（极度危险：含密码/Cookie/浏览历史）----------
+# 浏览器自动化产生的临时用户目录，绝不允许进入版本库
+docs/_ep_pos/
+*_ep_pos/
+.edge-profile/
+chrome-profile/
+
+# ---------- 4. 本地笔记与调试产物（非项目代码）----------
+# docs/ 为本地笔记、讲解页面与调试脚本，不属于交付内容
+docs/
+
+# ---------- 5. Python 虚拟环境（体积 1GB+，机器专属）----------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- 6. Python 缓存与编译产物 ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+
+# ---------- 7. 测试与工具缓存 ----------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ---------- 8. IDE 配置 ----------
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---------- 9. 日志（可能含用户对话等隐私）----------
+logs/
+*.log
+
+# ---------- 10. 运行时生成的数据（可重建，不必提交）----------
+data/vectorstore/
+data/vectorstore-nonexistent-xyz/
+data/chroma/
+*.sqlite3
+
+# 测试跑出来的临时向量库（含二进制分块文件，可重建）
+tests/data/
+
+# uv 初始化模板残留的 src/ 骨架，项目实际代码全部在 app/ 下
+src/
+
+# 本地取证/诊断产物，一律不进仓库
+_sus_report.txt
+docs/local-notes/
+
+# ---------- 11. 操作系统垃圾文件 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- 12. Jupyter ----------
+.ipynb_checkpoints/
+
+# ---------- 13. 临时目录 ----------
+tmp/
+temp/
