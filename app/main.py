@@ -4,12 +4,14 @@ FastAPI 应用入口
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 from app.api.v1 import chat, conversations, users
 from app.config import settings
+from app.utils.error_messages import friendly_validation_message
 from app.utils.logger import app_logger
 
 
@@ -155,6 +157,38 @@ app.add_middleware(
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(conversations.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    """
+    把 FastAPI 默认的 Pydantic 英文错误数组翻译成人话
+
+    默认返回长这样，前端直接显示会变成 [object Object]：
+        {"detail":[{"type":"string_too_short","loc":["body","password"], ...}]}
+
+    现在同时给出：
+        msg    人话文案（项目统一错误结构）
+        detail 同一句人话的字符串形式（兼容只读 detail 的前端）
+        errors 原始结构化错误，方便调试与定位字段
+    """
+    errors = list(exc.errors())
+    message = friendly_validation_message(errors)
+    app_logger.info(f"⚠️ 参数校验未通过: {request.method} {request.url.path} -> {message}")
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "code": 422,
+            "msg": message,
+            "data": None,
+            "detail": message,
+            "errors": errors,
+        },
+    )
 
 
 @app.get("/")

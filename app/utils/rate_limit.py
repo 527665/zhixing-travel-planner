@@ -13,6 +13,7 @@
 
 import time
 from collections import defaultdict, deque
+from dataclasses import dataclass
 from typing import Deque
 
 from fastapi import Depends, HTTPException, Request, status
@@ -116,26 +117,35 @@ def get_client_ip(request: Request) -> str:
 # ============== 限流规则表（唯一调参入口）==============
 # 想改阈值只改这里，不用碰业务代码。
 
-RATE_RULES: dict[str, tuple[int, int]] = {
+@dataclass(frozen=True)
+class RateRule:
+    """一条限流规则：次数、窗口秒数、给用户看的文案"""
+
+    limit: int
+    window_seconds: int
+    message: str
+
+
+RATE_RULES: dict[str, RateRule] = {
     # 注册：同 IP 每小时 5 次，挡批量注册
-    "register": (5, 3600),
+    "register": RateRule(5, 3600, "注册太频繁了，请一小时后再试"),
     # 登录：同 IP 每分钟 10 次，挡撞库
-    "login": (10, 60),
+    "login": RateRule(10, 60, "登录尝试太频繁，请一分钟后再试"),
     # 流式对话：同 IP 每小时 300 次，挡匿名洪水
-    "chat_ip": (300, 3600),
+    "chat_ip": RateRule(300, 3600, "当前网络请求过于频繁，请稍后再试"),
     # 流式对话：同用户每分钟 8 次，真正防烧钱
-    "chat_user_minute": (8, 60),
+    "chat_user_minute": RateRule(8, 60, "对话速度过快，请稍等一会"),
     # 流式对话：同用户每小时 120 次，防"每分钟歇一下再刷"
-    "chat_user_hour": (120, 3600),
+    "chat_user_hour": RateRule(120, 3600, "本小时对话次数已用完，请稍后再试"),
 }
 
 _LIMITERS: dict[str, SlidingWindowRateLimiter] = {
     rule_name: SlidingWindowRateLimiter(
-        limit=limit,
-        window_seconds=window,
+        limit=rule.limit,
+        window_seconds=rule.window_seconds,
         name=rule_name,
     )
-    for rule_name, (limit, window) in RATE_RULES.items()
+    for rule_name, rule in RATE_RULES.items()
 }
 
 
@@ -145,7 +155,7 @@ def _check(rule_name: str, identity: str) -> None:
     if not limiter.allow(identity):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="对话速度过快，请稍等一会",
+            detail=RATE_RULES[rule_name].message,
             headers={"Retry-After": str(limiter.retry_after(identity))},
         )
 
